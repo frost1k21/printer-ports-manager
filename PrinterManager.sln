@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrinterManager.Core", "PrinterManager.Core\PrinterManager.Core.csproj", "{4642F830-35C8-4FBF-81C7-A7C5469E8D74}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrinterManager.Core", "PrinterManager.Core\PrinterManager.Core.csproj", "{4642F830-35C8-4FBF-81C7-A7C5469E8D74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrinterManager.ConsoleUI", "PrinterManager.ConsoleUI\PrinterManager.ConsoleUI.csproj", "{F2BFC8DF-F03D-43E9-866B-B4D3292CA1A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrinterManager.ConsoleUI", "PrinterManager.ConsoleUI\PrinterManager.ConsoleUI.csproj", "{F2BFC8DF-F03D-43E9-866B-B4D3292CA1A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrinterManager.BlazorServerApp", "PrinterManager.BlazorServerApp\PrinterManager.BlazorServerApp.csproj", "{7365895A-A7EF-4D46-A237-82433FEDB3FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{F2BFC8DF-F03D-43E9-866B-B4D3292CA1A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2BFC8DF-F03D-43E9-866B-B4D3292CA1A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2BFC8DF-F03D-43E9-866B-B4D3292CA1A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7365895A-A7EF-4D46-A237-82433FEDB3FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7365895A-A7EF-4D46-A237-82433FEDB3FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7365895A-A7EF-4D46-A237-82433FEDB3FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7365895A-A7EF-4D46-A237-82433FEDB3FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
