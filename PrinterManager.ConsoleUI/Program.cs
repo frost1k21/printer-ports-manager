@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PrinterManager.Core;
+using System;
+using System.Threading.Tasks;
 
 namespace PrinterManager.ConsoleUI
 {
@@ -12,6 +14,13 @@ namespace PrinterManager.ConsoleUI
             Console.Write("Введите имя компьютера для добавления порта принтера: ");
             var targetComputerName = Console.ReadLine();
 
+
+            var printerPortManager = new PrinterPortManager();
+
+            var createPrinterPortResult = printerPortManager.CreatePort(printerPortName, targetComputerName);
+
+
+            Console.WriteLine(createPrinterPortResult);
 
             Console.WriteLine("Для выхода нажмите любую клавишу...");
             Console.ReadKey(false);
