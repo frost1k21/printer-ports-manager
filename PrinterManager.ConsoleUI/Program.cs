@@ -6,7 +6,15 @@ namespace PrinterManager.ConsoleUI
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Вас приветсвует программа для управлению принтерами");
+            Console.Write("Введите имя порта для принтера: ");
+            var printerPortName = Console.ReadLine();
+            Console.Write("Введите имя компьютера для добавления порта принтера: ");
+            var targetComputerName = Console.ReadLine();
+
+
+            Console.WriteLine("Для выхода нажмите любую клавишу...");
+            Console.ReadKey(false);
         }
     }
 }
