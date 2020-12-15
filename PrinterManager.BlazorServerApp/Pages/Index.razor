@@ -4,11 +4,21 @@
 
 
 <h1>Добаление локального порта для принтера</h1>
-<span>Введите имя локального порта</span>
-<input type="text" name="printerPortName" placeholder="\\имя компьютера\имя общего ресурса" @bind="_printerPortName" />
-<span>Введите имя целевого компьютера</span>
-<input type="text" name="targetComputerName" placeholder="Ws..." @bind="_targetComputerName" />
-<button disabled="@(!IsCorrect)" @onclick="Create">Создать</button>
+<div class="mb-3">
+    <label for="printerPortName" class="form-label">Введите имя локального порта</label>
+    <input type="text" name="printerPortName" 
+           placeholder="\\имя компьютера\имя общего ресурса"
+           class="form-control"
+           @bind="_printerPortName" @bind:event = "oninput"/>
+</div>
+<div class="mb-3">
+    <label for="targetComputerName" class="form-label">Введите имя целевого компьютера</label>
+    <input type="text" name="targetComputerName" 
+           placeholder="Ws..."
+           class="form-control"
+           @bind="_targetComputerName" @bind:event = "oninput"/>
+</div>
+<button disabled="@(!IsCorrect)" @onclick="Create" class="btn btn-primary mb-3">Создать</button>
 <br />
 <span>@_resultOperation</span>
 
@@ -19,11 +29,13 @@
 
     public bool IsCorrect => !string.IsNullOrEmpty(_printerPortName) && !string.IsNullOrEmpty(_targetComputerName);
 
-    void Create()
+    async Task Create()
     {
-        if (!string.IsNullOrEmpty(_resultOperation)) _resultOperation = "";
-        _resultOperation = PrinterPortManager.CreatePort(_printerPortName, _targetComputerName);
-        Console.WriteLine(_resultOperation);
+        _resultOperation = "подождите, идет выполнение...";
+        await Task.Run(() =>
+        {
+            _resultOperation = PrinterPortManager.CreatePort(_printerPortName, _targetComputerName);
+        });
         _printerPortName = "";
         _targetComputerName = "";
     }
