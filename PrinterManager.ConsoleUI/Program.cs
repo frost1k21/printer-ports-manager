@@ -1,6 +1,5 @@
 ﻿using PrinterManager.Core;
 using System;
-using System.Threading.Tasks;
 
 namespace PrinterManager.ConsoleUI
 {
