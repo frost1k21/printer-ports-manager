@@ -1,7 +1,31 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+@inject IPrinterPortManager PrinterPortManager
 
-Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<h1>Добаление локального порта для принтера</h1>
+<span>Введите имя локального порта</span>
+<input type="text" name="printerPortName" placeholder="\\имя компьютера\имя общего ресурса" @bind="_printerPortName" />
+<span>Введите имя целевого компьютера</span>
+<input type="text" name="targetComputerName" placeholder="Ws..." @bind="_targetComputerName" />
+<button disabled="@(!IsCorrect)" @onclick="Create">Создать</button>
+<br />
+<span>@_resultOperation</span>
+
+@code {
+    private string _printerPortName = "";
+    private string _targetComputerName = "";
+    private string _resultOperation = "";
+
+    public bool IsCorrect => !string.IsNullOrEmpty(_printerPortName) && !string.IsNullOrEmpty(_targetComputerName);
+
+    void Create()
+    {
+        if (!string.IsNullOrEmpty(_resultOperation)) _resultOperation = "";
+        _resultOperation = PrinterPortManager.CreatePort(_printerPortName, _targetComputerName);
+        Console.WriteLine(_resultOperation);
+        _printerPortName = "";
+        _targetComputerName = "";
+    }
+
+}
