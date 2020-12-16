@@ -14,7 +14,7 @@ namespace PrinterManager.Core
             var ps = PowerShell.Create();
             ps.AddScript("Set-ExecutionPolicy Unrestricted")
                 .AddStatement().AddScript("Import-Module PrintManagement")
-                .AddStatement().AddScript($"Add-PrinterPort -Name {printerPortName} -ComputerName {targetComputerName}")
+                .AddStatement().AddScript($"Add-PrinterPort -Name \"{printerPortName}\" -ComputerName {targetComputerName}")
                 .AddStatement().AddScript("Set-ExecutionPolicy Restricted");
 
             
