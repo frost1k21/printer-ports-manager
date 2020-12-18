@@ -4,18 +4,25 @@ namespace PrinterManager.Core
 {
     public interface IPrinterPortManager
     {
-        string CreatePort(string printerPortName, string targetComputerName);
+        string CreatePort(string printerPortName, string targetComputerName, bool isNetwork);
     }
 
     public class PrinterPortManager : IPrinterPortManager
     {
-        public string CreatePort(string printerPortName, string targetComputerName)
+        public string CreatePort(string printerPortName, string targetComputerName, bool isNetwork)
         {
             var ps = PowerShell.Create();
             ps.AddScript("Set-ExecutionPolicy Unrestricted")
-                .AddStatement().AddScript("Import-Module PrintManagement")
-                .AddStatement().AddScript($"Add-PrinterPort -Name \"{printerPortName}\" -ComputerName {targetComputerName}")
-                .AddStatement().AddScript("Set-ExecutionPolicy Restricted");
+                .AddStatement().AddScript("Import-Module PrintManagement");
+            if (isNetwork)
+            {
+                ps.AddStatement().AddScript($"Add-PrinterPort -Name \"{printerPortName}\" -ComputerName {targetComputerName} -PrinterHostAddress \"{printerPortName}\"");
+            }
+            else
+            {
+                ps.AddStatement().AddScript($"Add-PrinterPort -Name \"{printerPortName}\" -ComputerName {targetComputerName}");
+            }
+            ps.AddStatement().AddScript("Set-ExecutionPolicy Restricted");
 
             
             var result = "";

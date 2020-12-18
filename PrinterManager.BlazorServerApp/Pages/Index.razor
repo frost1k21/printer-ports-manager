@@ -3,9 +3,9 @@
 @inject IPrinterPortManager PrinterPortManager
 
 
-<h1>Добаление локального порта для принтера</h1>
+<h1>Добаление порта для принтера</h1>
 <div class="mb-3">
-    <label for="printerPortName" class="form-label">Введите имя локального порта</label>
+    <label for="printerPortName" class="form-label">Введите имя порта</label>
     <input type="text" name="printerPortName" 
            placeholder="\\имя компьютера\имя общего ресурса"
            class="form-control"
@@ -26,6 +26,7 @@
     private string _printerPortName = "";
     private string _targetComputerName = "";
     private string _resultOperation = "";
+    private bool _isNetwork = false;
 
     public bool IsCorrect => !string.IsNullOrEmpty(_printerPortName) && !string.IsNullOrEmpty(_targetComputerName);
 
@@ -34,7 +35,7 @@
         _resultOperation = "подождите, идет выполнение...";
         await Task.Run(() =>
         {
-            _resultOperation = PrinterPortManager.CreatePort(_printerPortName, _targetComputerName);
+            _resultOperation = PrinterPortManager.CreatePort(_printerPortName, _targetComputerName, _isNetwork);
         });
         _printerPortName = "";
         _targetComputerName = "";
