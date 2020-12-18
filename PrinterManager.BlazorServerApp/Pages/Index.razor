@@ -4,17 +4,23 @@
 
 
 <h1>Добаление порта для принтера</h1>
+<div class="form-check">
+    <input name="isNetwork" type="checkbox"
+           class="form-check-input"
+           @bind-value="_isNetwork" />
+    <label class="form-label" for="isNetwork">Сетевой принтер</label>
+</div>
 <div class="mb-3">
     <label for="printerPortName" class="form-label">Введите имя порта</label>
-    <input type="text" name="printerPortName" 
-           placeholder="\\имя компьютера\имя общего ресурса"
+    <input type="text" name="printerPortName"
+           placeholder="@(PlaceholderStringForNamePort)"
            class="form-control"
-           @bind="_printerPortName" @bind:event = "oninput"/>
+           @bind="_printerPortName" @bind:event="oninput" />
 </div>
 <div class="mb-3">
     <label for="targetComputerName" class="form-label">Введите имя целевого компьютера</label>
     <input type="text" name="targetComputerName" 
-           placeholder="Ws..."
+           placeholder="WsXXX"
            class="form-control"
            @bind="_targetComputerName" @bind:event = "oninput"/>
 </div>
@@ -29,6 +35,7 @@
     private bool _isNetwork = false;
 
     public bool IsCorrect => !string.IsNullOrEmpty(_printerPortName) && !string.IsNullOrEmpty(_targetComputerName);
+    public string PlaceholderStringForNamePort => (_isNetwork) ? "printerXX или 192.168.X.X" : @"\\WsXXX\CanonLBP 6030";
 
     async Task Create()
     {
@@ -40,5 +47,4 @@
         _printerPortName = "";
         _targetComputerName = "";
     }
-
 }
