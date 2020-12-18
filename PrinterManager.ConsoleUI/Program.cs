@@ -16,7 +16,7 @@ namespace PrinterManager.ConsoleUI
 
             var printerPortManager = new PrinterPortManager();
 
-            var createPrinterPortResult = printerPortManager.CreatePort(printerPortName, targetComputerName);
+            var createPrinterPortResult = printerPortManager.CreatePort(printerPortName, targetComputerName, false);
 
 
             Console.WriteLine(createPrinterPortResult);
