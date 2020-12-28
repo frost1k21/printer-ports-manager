@@ -5,18 +5,18 @@
 
 
 <h1>Добаление порта для принтера</h1>
-<div class="form-check">
-    <input name="isNetwork" type="checkbox"
-           class="form-check-input"
+<div class="custom-control custom-switch">
+    <input name="isNetwork" type="checkbox" id="isNetwork"
+           class="custom-control-input"
            @bind-value="_isNetwork" />
-    <label class="form-label" for="isNetwork">Сетевой принтер</label>
+    <label class="custom-control-label" for="isNetwork">Сетевой принтер</label>
 </div>
-<div class="form-check">
-    <input name="isManualInput" type="checkbox"
-           class="form-check-input"
+<div class="custom-control custom-switch">
+    <input name="isManualInput" type="checkbox" id="isManualInput"
+           class="custom-control-input"
            checked="@_isManualInput"
            @bind-value="_isManualInput" />
-    <label class="form-label" for="isNetwork">Самостоятельный ввод имени порта</label>
+    <label class="custom-control-label" for="isManualInput">Самостоятельный ввод имени порта</label>
 </div>
 @if (_isManualInput)
 {
