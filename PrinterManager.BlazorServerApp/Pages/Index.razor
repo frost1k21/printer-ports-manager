@@ -1,6 +1,7 @@
 ﻿@page "/"
 
 @inject IPrinterPortManager PrinterPortManager
+@inject IPrinterInfoCollector PrinterCollector
 
 
 <h1>Добаление порта для принтера</h1>
@@ -10,19 +11,69 @@
            @bind-value="_isNetwork" />
     <label class="form-label" for="isNetwork">Сетевой принтер</label>
 </div>
-<div class="mb-3">
-    <label for="printerPortName" class="form-label">Введите имя порта</label>
-    <input type="text" name="printerPortName"
-           placeholder="@(PlaceholderStringForNamePort)"
-           class="form-control"
-           @bind="_printerPortName" @bind:event="oninput" />
+<div class="form-check">
+    <input name="isManualInput" type="checkbox"
+           class="form-check-input"
+           checked="@_isManualInput"
+           @bind-value="_isManualInput" />
+    <label class="form-label" for="isNetwork">Самостоятельный ввод имени порта</label>
 </div>
+@if (_isManualInput)
+{
+    <div class="mb-3">
+        <label for="printerPortName" class="form-label">Введите имя порта</label>
+        <input type="text" name="printerPortName"
+               placeholder="@(PlaceholderStringForNamePort)"
+               class="form-control"
+               @bind="_printerPortName" @bind:event="oninput" />
+    </div>
+}
+else
+{
+    <div class="mb-3">
+        <label for="mainComputerName" class="form-label">Введите имя главного компьютера</label>
+        <div class="input-group">
+            <input type="text" name="mainComputerName"
+                   placeholder="WsXXX"
+                   class="form-control"
+                   aria-describedby="button-addon2"
+                   @bind="_mainComputerName" @bind:event="oninput" />
+            <button class="btn btn-outline-primary"
+                    type="button" id="button-addon2"
+                    disabled="@(IsMainComputerNameEmpty)"
+                    @onclick="GetPrinterInfo">
+                Опросить
+            </button>
+        </div>
+    </div>
+    <div class="mb-3">
+        @if (_printerInfoList == null)
+        {
+            <p></p>
+        }
+        else if (_printerInfoList.Count() != 0)
+        {
+            @foreach (var item in _printerInfoList)
+            {
+                <p>Имя принтера: @item.Name</p>
+                @if (!_isNetwork)
+                {
+                    <p>Имя общего ресурса @item.ShareName</p>
+                }
+                <p>Порт: @item.PortName</p>
+                <button class="btn btn-primary"
+                        @onclick="@(() => ChoosePort(item))">Выбрать</button>
+                <hr />
+            }
+        }
+    </div>
+}
 <div class="mb-3">
     <label for="targetComputerName" class="form-label">Введите имя целевого компьютера</label>
-    <input type="text" name="targetComputerName" 
+    <input type="text" name="targetComputerName"
            placeholder="WsXXX"
            class="form-control"
-           @bind="_targetComputerName" @bind:event = "oninput"/>
+           @bind="_targetComputerName" @bind:event="oninput" />
 </div>
 <button disabled="@(!IsCorrect)" @onclick="Create" class="btn btn-primary mb-3">Создать</button>
 <br />
@@ -32,10 +83,18 @@
     private string _printerPortName = "";
     private string _targetComputerName = "";
     private string _resultOperation = "";
+    private string _mainComputerName = "";
+    private string _tempComputername = "";
+
     private bool _isNetwork = false;
+    private bool _isManualInput = true;
+
+    private PrinterInfo[] _printerInfoList;
 
     public bool IsCorrect => !string.IsNullOrEmpty(_printerPortName) && !string.IsNullOrEmpty(_targetComputerName);
+    public bool IsMainComputerNameEmpty => string.IsNullOrEmpty(_mainComputerName);
     public string PlaceholderStringForNamePort => (_isNetwork) ? "printerXX или 192.168.X.X" : @"\\WsXXX\CanonLBP 6030";
+
 
     async Task Create()
     {
@@ -46,5 +105,36 @@
         });
         _printerPortName = "";
         _targetComputerName = "";
+    }
+
+    async Task GetPrinterInfo()
+    {
+        await Task.Run(() =>
+        {
+            if (!_isNetwork)
+            {
+                _printerInfoList = PrinterCollector.GetPrintersInfoWithShareName(_mainComputerName).ToArray();
+            }
+            else
+            {
+                _printerInfoList = PrinterCollector.GetPrintersInfoWithTcpIpPort(_mainComputerName).ToArray();
+            }
+        });
+        _tempComputername = _mainComputerName;
+        _mainComputerName = "";
+    }
+
+    void ChoosePort(PrinterInfo printerInfo)
+    {
+        if(_isNetwork)
+        {
+            _printerPortName = printerInfo.PortName;
+            _isManualInput = !_isManualInput;
+        }
+        else
+        {
+            _printerPortName = $@"\\{_tempComputername}\{printerInfo.ShareName}";
+            _isManualInput = !_isManualInput;
+        }
     }
 }
