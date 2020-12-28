@@ -55,12 +55,12 @@ else
         {
             @foreach (var item in _printerInfoList)
             {
-                <p>Имя принтера: @item.Name</p>
+                <p>Имя принтера: <b>@item.Name</b></p>
                 @if (!_isNetwork)
                 {
-                    <p>Имя общего ресурса @item.ShareName</p>
+                    <p>Имя общего ресурса: <b>@item.ShareName</b></p>
                 }
-                <p>Порт: @item.PortName</p>
+                <p>Порт: <b>@item.PortName</b></p>
                 <button class="btn btn-primary"
                         @onclick="@(() => ChoosePort(item))">Выбрать</button>
                 <hr />
