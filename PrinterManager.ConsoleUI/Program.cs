@@ -1,6 +1,7 @@
 ﻿using PrinterManager.Core;
 using System.Linq;
 using System;
+using System.Runtime.Versioning;
 
 namespace PrinterManager.ConsoleUI
 {
@@ -30,14 +31,14 @@ namespace PrinterManager.ConsoleUI
 
             Console.WriteLine(createPrinterPortResult);
         }
-
+        [SupportedOSPlatform("windows")]
         private static void GetPrinterInfo()
         {
             Console.WriteLine("Сбор информации по принетрам");
             Console.Write("Введите имя целевого компьютера: ");
             var wsName = Console.ReadLine();
             var printerInfoCollector = new PrinterInfoCollector();
-            var result = printerInfoCollector.GetPrinterInfoWithTcpIpPort(wsName);
+            var result = printerInfoCollector.GetPrintersInfoWithTcpIpPort(wsName);
             Console.WriteLine();
             Console.WriteLine("Результаты запроса:");
             Console.WriteLine();
