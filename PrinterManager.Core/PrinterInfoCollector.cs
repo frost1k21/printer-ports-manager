@@ -11,24 +11,27 @@ namespace PrinterManager.Core
     {
         public IEnumerable<PrinterInfo> GetPrinterInfo(string wsName)
         {
-            return GetPrinterInfoFromQuery(wsName, "Select Name, ShareName, PortName from win32_printer");
+            var scope = GetMangementScope(wsName);
+            return GetPrinterInfoFromQuery(wsName, "Select Name, ShareName, PortName from win32_printer", scope);
         }
 
         public IEnumerable<PrinterInfo> GetPrinterInfoWithShareName(string wsName)
         {
-            return GetPrinterInfoFromQuery(wsName, "Select Name, ShareName, PortName from win32_printer where ShareName != null");
+            var scope = GetMangementScope(wsName);
+            return GetPrinterInfoFromQuery(wsName, "Select Name, ShareName, PortName from win32_printer where ShareName != null", scope);
         }
 
         public IEnumerable<PrinterInfo> GetPrinterInfoWithTcpIpPort(string wsName)
         {
+            var scope = GetMangementScope(wsName);
             var printerInfoCollection = new List<PrinterInfo>();
-            var tcpIpPrinterPorts = GetTcpIpPrinterPorts(wsName);
+            var tcpIpPrinterPorts = GetTcpIpPrinterPorts(wsName, scope);
 
             if (tcpIpPrinterPorts.Count() == 0)
                 return printerInfoCollection;
             foreach (var item in tcpIpPrinterPorts)
             {
-                var tcpIpPrinters = GetPrinterInfoFromQuery(wsName, $@"Select Name, ShareName, PortName from win32_printer where PortName = ""{item.portName}""");
+                var tcpIpPrinters = GetPrinterInfoFromQuery(wsName, $@"Select Name, ShareName, PortName from win32_printer where PortName = ""{item.portName}""", scope);
                 if (tcpIpPrinters.Count() != 0)
                     printerInfoCollection.AddRange(tcpIpPrinters);
             }
@@ -36,15 +39,17 @@ namespace PrinterManager.Core
             return printerInfoCollection;
         }
 
-        private IEnumerable<PrinterInfo> GetPrinterInfoFromQuery(string wsName, string query)
+        private ManagementScope GetMangementScope(string wsName)
+        {
+            var scope = new ManagementScope($@"\\{wsName}\root\cimv2");
+            scope.Connect();
+            return scope;
+        }
+        private IEnumerable<PrinterInfo> GetPrinterInfoFromQuery(string wsName, string query, ManagementScope scope)
         {
             var listOfPrinterOnfo = new List<PrinterInfo>();
 
-            var scope = new ManagementScope($@"\\{wsName}\root\cimv2");
-            scope.Connect();
-
             var selectQuery = new ObjectQuery(query);
-
 
             var searchResult = new ManagementObjectSearcher(scope, selectQuery).Get();
             foreach (var item in searchResult)
@@ -65,11 +70,9 @@ namespace PrinterManager.Core
             return listOfPrinterOnfo;
         }
 
-        private IEnumerable<(string portName, string hostAddress)> GetTcpIpPrinterPorts(string wsName)
+        private IEnumerable<(string portName, string hostAddress)> GetTcpIpPrinterPorts(string wsName, ManagementScope scope)
         {
             var tcpIpPrinterPortCollection = new List<(string portName, string hostAddress)>();
-            var scope = new ManagementScope($@"\\{wsName}\root\cimv2");
-            scope.Connect();
 
             var selectQuery = new ObjectQuery("Select Name, HostAddress from win32_tcpipprinterport");
             var searchResult = new ManagementObjectSearcher(scope, selectQuery).Get();
