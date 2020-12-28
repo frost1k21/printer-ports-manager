@@ -24,7 +24,8 @@ namespace PrinterManager.BlazorServerApp
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
-            services.AddSingleton<IPrinterPortManager, PrinterPortManager>();
+            services.AddScoped<IPrinterPortManager, PrinterPortManager>();
+            services.AddScoped<IPrinterInfoCollector, PrinterInfoCollector>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
