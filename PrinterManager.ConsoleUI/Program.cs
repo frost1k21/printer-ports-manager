@@ -7,11 +7,12 @@ namespace PrinterManager.ConsoleUI
 {
     class Program
     {
+        [SupportedOSPlatform("windows")]
         static void Main(string[] args)
         {
             Console.WriteLine("Вас приветсвует программа для управлению принтерами");
-            //CreatePrinterPort();
-            GetPrinterInfo();
+            CreatePrinterPort();
+            //GetPrinterInfo();
             Console.WriteLine("Для выхода нажмите любую клавишу...");
             Console.ReadKey(false);
         }
@@ -26,7 +27,7 @@ namespace PrinterManager.ConsoleUI
 
             var printerPortManager = new PrinterPortManager();
 
-            var createPrinterPortResult = printerPortManager.CreatePort(printerPortName, targetComputerName, false);
+            var createPrinterPortResult = printerPortManager.CreatePortNew(printerPortName, targetComputerName, false);
 
 
             Console.WriteLine(createPrinterPortResult);
