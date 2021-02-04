@@ -5,6 +5,7 @@ namespace PrinterManager.Core
     public interface IPrinterPortManager
     {
         string CreatePort(string printerPortName, string targetComputerName, bool isNetwork);
+        string CreatePortNew(string printerPortName, string targetComputerName, bool isNetwork);
     }
 
     public class PrinterPortManager : IPrinterPortManager

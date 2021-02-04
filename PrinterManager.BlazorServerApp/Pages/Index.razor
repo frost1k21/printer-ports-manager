@@ -101,7 +101,7 @@ else
         _resultOperation = "подождите, идет выполнение...";
         await Task.Run(() =>
         {
-            _resultOperation = PrinterPortManager.CreatePort(_printerPortName, _targetComputerName, _isNetwork);
+            _resultOperation = PrinterPortManager.CreatePortNew(_printerPortName, _targetComputerName, _isNetwork);
         });
         _printerPortName = "";
         _targetComputerName = "";
