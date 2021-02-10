@@ -3,7 +3,6 @@
 @inject IPrinterPortManager PrinterPortManager
 @inject IPrinterInfoCollector PrinterCollector
 
-
 <h1>Добаление порта для принтера</h1>
 <div class="custom-control custom-switch">
     <input name="isNetwork" type="checkbox" id="isNetwork"
@@ -62,79 +61,130 @@ else
                 }
                 <p>Порт: <b>@item.PortName</b></p>
                 <button class="btn btn-primary"
-                        @onclick="@(() => ChoosePort(item))">Выбрать</button>
+                        @onclick="@(() => ChoosePort(item))">
+                    Выбрать
+                </button>
                 <hr />
             }
         }
     </div>
 }
 <div class="mb-3">
-    <label for="targetComputerName" class="form-label">Введите имя целевого компьютера</label>
-    <input type="text" name="targetComputerName"
-           placeholder="WsXXX"
-           class="form-control"
-           @bind="_targetComputerName" @bind:event="oninput" />
-</div>
-<button disabled="@(!IsCorrect)" @onclick="Create" class="btn btn-primary mb-3">Создать</button>
-<br />
-<span>@_resultOperation</span>
-
-@code {
-    private string _printerPortName = "";
-    private string _targetComputerName = "";
-    private string _resultOperation = "";
-    private string _mainComputerName = "";
-    private string _tempComputername = "";
-
-    private bool _isNetwork = false;
-    private bool _isManualInput = true;
-
-    private PrinterInfo[] _printerInfoList;
-
-    public bool IsCorrect => !string.IsNullOrEmpty(_printerPortName) && !string.IsNullOrEmpty(_targetComputerName);
-    public bool IsMainComputerNameEmpty => string.IsNullOrEmpty(_mainComputerName);
-    public string PlaceholderStringForNamePort => (_isNetwork) ? "printerXX или 192.168.X.X" : @"\\WsXXX\CanonLBP 6030";
-
-
-    async Task Create()
+    <label for="targetComputerName" class="form-label">Введите имя целевого компьютера. Поддерживается множественный ввод или вставка текста.</label>
+        <div class="input-group">
+            <textarea type="text" name="targetComputerName"
+                      rows="3"
+                      placeholder="WsXXX"
+                      class="form-control"
+                      @bind="_rawText"
+                      @bind:event="oninput"
+                   />
+            <button class="btn btn-outline-primary"
+                    type="button" id="button-addon3"
+                    @onclick="ParseWsNamesFromTextArea"
+                    disabled="@(string.IsNullOrEmpty(_printerPortName) || string.IsNullOrEmpty(_rawText))">
+                Добавить
+            </button>
+        </div>
+    </div>
+    @if (_statuses.Count() == 0)
     {
-        _resultOperation = "подождите, идет выполнение...";
-        await Task.Run(() =>
+        <span>Пока ничего нет</span>
+    }
+    else
+    {
+        @foreach (var item in _statuses)
         {
-            _resultOperation = PrinterPortManager.CreatePortNew(_printerPortName, _targetComputerName, _isNetwork);
-        });
-        _printerPortName = "";
-        _targetComputerName = "";
+            <PrinterPortStatus TargetComputerName="@item.Key" PrinterPortname="@item.Value" IsNetworkPort="@_isNetwork"/>
+        }
     }
 
-    async Task GetPrinterInfo()
-    {
-        await Task.Run(() =>
+    @code {
+        private string _printerPortName = "";
+        private string _targetComputerName = "";
+        private string _resultOperation = "";
+        private string _mainComputerName = "";
+        private string _tempComputername = "";
+
+        private string _rawText = "";
+
+        private bool _isNetwork = false;
+        private bool _isManualInput = true;
+
+        private PrinterInfo[] _printerInfoList;
+
+        private ConcurrentDictionary<string, string> _statuses = new ConcurrentDictionary<string, string>();
+
+        public bool IsCorrect => !string.IsNullOrEmpty(_printerPortName) && !string.IsNullOrEmpty(_targetComputerName);
+        public bool IsMainComputerNameEmpty => string.IsNullOrEmpty(_mainComputerName);
+        public string PlaceholderStringForNamePort => (_isNetwork) ? "printerXX или 192.168.X.X" : @"\\WsXXX\CanonLBP 6030";
+
+
+        async Task Create()
         {
-            if (!_isNetwork)
+            _resultOperation = "подождите, идет выполнение...";
+            await Task.Run(() =>
             {
-                _printerInfoList = PrinterCollector.GetPrintersInfoWithShareName(_mainComputerName).ToArray();
+                _resultOperation = PrinterPortManager.CreatePortNew(_printerPortName, _targetComputerName, _isNetwork);
+            });
+            _printerPortName = "";
+            _targetComputerName = "";
+        }
+
+        async Task CreateTest()
+        {
+            await Task.Run(async () =>
+            {
+                _statuses.TryAdd(_targetComputerName, _printerPortName);
+                _printerPortName = "";
+                _targetComputerName = "";
+                await Task.Delay(1000);
+                _statuses.TryAdd(DateTime.Now.Millisecond.ToString(), DateTime.Now.ToShortDateString());
+            });
+        }
+
+        async Task GetPrinterInfo()
+        {
+            await Task.Run(() =>
+            {
+                if (!_isNetwork)
+                {
+                    _printerInfoList = PrinterCollector.GetPrintersInfoWithShareName(_mainComputerName).ToArray();
+                }
+                else
+                {
+                    _printerInfoList = PrinterCollector.GetPrintersInfoWithTcpIpPort(_mainComputerName).ToArray();
+                }
+            });
+            _tempComputername = _mainComputerName;
+            _mainComputerName = "";
+        }
+
+        void ChoosePort(PrinterInfo printerInfo)
+        {
+            if (_isNetwork)
+            {
+                _printerPortName = printerInfo.PortName;
+                _isManualInput = !_isManualInput;
             }
             else
             {
-                _printerInfoList = PrinterCollector.GetPrintersInfoWithTcpIpPort(_mainComputerName).ToArray();
+                _printerPortName = $@"\\{_tempComputername}\{printerInfo.ShareName}";
+                _isManualInput = !_isManualInput;
             }
-        });
-        _tempComputername = _mainComputerName;
-        _mainComputerName = "";
-    }
+        }
 
-    void ChoosePort(PrinterInfo printerInfo)
-    {
-        if(_isNetwork)
+        void ParseWsNamesFromTextArea()
         {
-            _printerPortName = printerInfo.PortName;
-            _isManualInput = !_isManualInput;
-        }
-        else
-        {
-            _printerPortName = $@"\\{_tempComputername}\{printerInfo.ShareName}";
-            _isManualInput = !_isManualInput;
+            Console.WriteLine(_rawText);
+            var pattern = @"(?i)ws[\d]{3,4}";
+            var regEx = new Regex(pattern);
+            var matches = regEx.Matches(_rawText);
+            foreach (var match in matches)
+            {
+                _statuses.TryAdd(match.ToString(), _printerPortName);
+            }
+            _rawText = "";
+            _printerPortName = "";
         }
     }
-}

@@ -1,0 +1,23 @@
+﻿@inject IPrinterPortManager PrinterPortManager
+
+<div>
+    <span>@_statusString</span>
+</div>
+
+@code {
+
+    private string _statusString;
+
+    [Parameter] public string PrinterPortname { get; set; } = "(пустой порт)";
+    [Parameter] public string TargetComputerName { get; set; } = "(пустое имя компьютера)";
+    [Parameter] public bool IsNetworkPort { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _statusString = $"Добаление порта {PrinterPortname} на {TargetComputerName}";
+        await Task.Run(() =>
+        {
+            _statusString = PrinterPortManager.CreatePortNew(PrinterPortname, TargetComputerName, IsNetworkPort);
+        });
+    }
+}
