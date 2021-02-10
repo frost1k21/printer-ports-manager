@@ -97,6 +97,10 @@ else
         {
             <PrinterPortStatus TargetComputerName="@item.Key" PrinterPortname="@item.Value" IsNetworkPort="@_isNetwork"/>
         }
+        <button class="btn btn-warning"
+                @onclick="StatusesDictionaryReset">
+            Сбросить список
+        </button>
     }
 
     @code {
@@ -186,5 +190,10 @@ else
             }
             _rawText = "";
             _printerPortName = "";
+        }
+
+        void StatusesDictionaryReset()
+        {
+            _statuses = new ConcurrentDictionary<string, string>();
         }
     }
