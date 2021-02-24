@@ -95,7 +95,7 @@ else
     {
         @foreach (var item in _statuses)
         {
-            <PrinterPortStatus TargetComputerName="@item.Key" PrinterPortname="@item.Value" IsNetworkPort="@_isNetwork"/>
+            <PrinterPortStatus TargetComputerName="@item.Value.targetComputer" PrinterPortname="@item.Value.printerPortName" IsNetworkPort="@_isNetwork"/>
         }
         <button class="btn btn-warning"
                 @onclick="StatusesDictionaryReset">
@@ -117,7 +117,7 @@ else
 
         private PrinterInfo[] _printerInfoList;
 
-        private ConcurrentDictionary<string, string> _statuses = new ConcurrentDictionary<string, string>();
+        private ConcurrentDictionary<string, (string targetComputer, string printerPortName)> _statuses = new ConcurrentDictionary<string, (string targetComputer, string printerPortName)>();
 
         public bool IsCorrect => !string.IsNullOrEmpty(_printerPortName) && !string.IsNullOrEmpty(_targetComputerName);
         public bool IsMainComputerNameEmpty => string.IsNullOrEmpty(_mainComputerName);
@@ -133,18 +133,6 @@ else
             });
             _printerPortName = "";
             _targetComputerName = "";
-        }
-
-        async Task CreateTest()
-        {
-            await Task.Run(async () =>
-            {
-                _statuses.TryAdd(_targetComputerName, _printerPortName);
-                _printerPortName = "";
-                _targetComputerName = "";
-                await Task.Delay(1000);
-                _statuses.TryAdd(DateTime.Now.Millisecond.ToString(), DateTime.Now.ToShortDateString());
-            });
         }
 
         async Task GetPrinterInfo()
@@ -180,13 +168,13 @@ else
 
         void ParseWsNamesFromTextArea()
         {
-            Console.WriteLine(_rawText);
             var pattern = @"(?i)ws[\d]{3,4}";
             var regEx = new Regex(pattern);
             var matches = regEx.Matches(_rawText);
             foreach (var match in matches)
             {
-                _statuses.TryAdd(match.ToString(), _printerPortName);
+                var wsName = match.ToString();
+                _statuses.TryAdd($"{wsName}{_printerPortName}", (wsName,_printerPortName));
             }
             _rawText = "";
             _printerPortName = "";
@@ -194,6 +182,6 @@ else
 
         void StatusesDictionaryReset()
         {
-            _statuses = new ConcurrentDictionary<string, string>();
+            _statuses = new ConcurrentDictionary<string, (string targetComputer, string printerPortName)>();
         }
     }
